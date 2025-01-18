@@ -1,0 +1,9 @@
+main: net.jandie1505.updatedisplayname.UpdateDisplayName
+name: UpdateDisplayName
+version: 1.0
+api-version: 1.13
+author: jandie1505
+softdepend:
+  - LuckPerms
+  - Vault
+  - PlaceholderAPI
