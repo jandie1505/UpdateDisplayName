@@ -114,7 +114,7 @@ public void onDisplayNameUpdated(TablistNameUpdatedEvent event) {
     );
 
 }
+```
 
 ### JavaDocs
 Click [here](https://jandie1505.github.io/UpdateDisplayName/) to get to the JavaDocs.
-```
