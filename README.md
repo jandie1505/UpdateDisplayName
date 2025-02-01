@@ -25,8 +25,35 @@ But if you want to change something, here are the config values:
 | `tablist --> format` | `<luckperms:prefix><player><luckperms:suffix>` | The player tablist name format. |
 | `update_interval` | `60` | The inverval the names should be updated in seconds. |
 ## Using the API
+### Import
+Using gradle:
+```kotlin
+repositories {
+    maven("https://maven.chaossquad.net/snapshots")
+}
 
+dependencies {
+    compileOnly("net.jandie1505:UpdateDisplayName:1.0-SNAPSHOT")
+}
+```
 
+Using maven:
+```xml
+<repository>
+  <id>ChaosSquad-Repository-snapshots</id>
+  <name>ChaosSquad Repository</name>
+  <url>https://maven.chaossquad.net/snapshots</url>
+</repository>
+```
+```xml
+<dependency>
+  <groupId>net.jandie1505</groupId>
+  <artifactId>UpdateDisplayName</artifactId>
+  <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+### Usage
 ```java
 // General features
 public void ApiExample() {
