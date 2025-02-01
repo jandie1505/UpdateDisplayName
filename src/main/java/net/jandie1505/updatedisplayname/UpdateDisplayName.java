@@ -134,7 +134,7 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
             player.displayName(this.generatePlayerDisplayName(player, this.config.optString(CONFIG_FORMAT_DISPLAYNAME, null)));
         }
 
-        if (this.config.optBoolean(CONFIG_TABLIST_FORMAT, false)) {
+        if (this.config.optBoolean(CONFIG_ENABLE_TABLIST_NAME, false)) {
             player.playerListName(this.generatePlayerDisplayName(player, this.config.optString(CONFIG_TABLIST_FORMAT, null)));
         }
 
