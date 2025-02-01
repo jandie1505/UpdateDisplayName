@@ -86,6 +86,10 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
         // LISTENER
 
         this.getServer().getPluginManager().registerEvents(this, this);
+
+        // INFO
+
+        this.getLogger().info("UpdateDisplayName has been successfully enabled\ncreated by jandie1505\nGitHub Repository: https://github.com/jandie1505/UpdateDisplayName");
     }
 
     @Override
