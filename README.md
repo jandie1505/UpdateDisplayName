@@ -50,6 +50,7 @@ Using maven:
   <groupId>net.jandie1505</groupId>
   <artifactId>UpdateDisplayName</artifactId>
   <version>1.0-RELEASE</version>
+  <scope>provided</scope>
 </dependency>
 ```
 
