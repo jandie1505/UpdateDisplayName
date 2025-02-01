@@ -24,3 +24,67 @@ But if you want to change something, here are the config values:
 | `tablist --> enable` | `true` | If the plugin should update the player's tablist name. |
 | `tablist --> format` | `<luckperms:prefix><player><luckperms:suffix>` | The player tablist name format. |
 | `update_interval` | `60` | The inverval the names should be updated in seconds. |
+## Using the API
+
+
+```java
+// General features
+public void ApiExample() {
+    UDNApi api = UpdateDisplayName.getApi();
+
+    Player player = Bukkit.getPlayer("playername")
+        
+    boolean updatesEnabled = this.updatesEnabled; // Get plugin functionality status
+    api.setUpdatesEnabled(false); // Disable plugin functionality
+        
+    api.updatePlayers(); // Update display names of all players
+    api.updatePlayer(player); // Update display name of the specified player
+        
+    Set<UUID> excludedPlayers = api.getExcludedPlayers(); // Get excluded players
+    boolean excluded = api.isPlayerExcluded(player); // Check if a player is excluded
+        
+    DataStorage config = api.getPluginConfig(); // Get plugin config
+}
+
+// Event for updated display name
+@EventHandler
+public void onDisplayNameUpdated(DisplayNameUpdatedEvent event) {
+
+    if (event.getPlayer().getName().equals("forbiddenName")) {
+        event.setCancelled(true)
+        return;
+    }
+
+    if (event.getUpdatedDisplayName() == null) {
+        Bukkit.broadcast(Component.text("Display name of " + event.getPlayer().getName() + " has been reset"))
+        return;
+    ]
+
+    Bukkit.broadcast(Component.empty()
+            .append(Component.text("Updated display name of player " + event.getPlayer().getName() + ": "))
+            .append(event.getUpdatedDisplayName())
+    );
+
+}
+
+// Event for updated tablist name
+@EventHandler
+public void onDisplayNameUpdated(TablistNameUpdatedEvent event) {
+
+    if (event.getPlayer().getName().equals("PleaseDontGiveMeATablistName")) {
+        event.setCancelled(true)
+        return;
+    }
+
+    if (event.getUpdatedTablistName() == null) {
+        Bukkit.broadcast(Component.text("Tablist name of " + event.getPlayer().getName() + " has been reset"))
+        return;
+    ]
+
+    Bukkit.broadcast(Component.empty()
+            .append(Component.text("Updated tablist name of player " + event.getPlayer().getName() + ": "))
+            .append(event.getUpdatedTablistName())
+    );
+
+}
+```
