@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"Alle Packages","u":"allpackages-index.html"},{"l":"net.jandie1505.updatedisplayname"},{"l":"net.jandie1505.updatedisplayname.api"},{"l":"net.jandie1505.updatedisplayname.command"},{"l":"net.jandie1505.updatedisplayname.event"}];updateSearchResults();
