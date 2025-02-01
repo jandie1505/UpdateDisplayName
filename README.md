@@ -29,27 +29,27 @@ But if you want to change something, here are the config values:
 Using gradle:
 ```kotlin
 repositories {
-    maven("https://maven.chaossquad.net/snapshots")
+    maven("https://maven.chaossquad.net/releases")
 }
 
 dependencies {
-    compileOnly("net.jandie1505:UpdateDisplayName:1.0-SNAPSHOT")
+    compileOnly("net.jandie1505:UpdateDisplayName:1.0-RELEASE")
 }
 ```
 
 Using maven:
 ```xml
 <repository>
-  <id>ChaosSquad-Repository-snapshots</id>
+  <id>ChaosSquad-Repository-releases</id>
   <name>ChaosSquad Repository</name>
-  <url>https://maven.chaossquad.net/snapshots</url>
+  <url>https://maven.chaossquad.net/releases</url>
 </repository>
 ```
 ```xml
 <dependency>
   <groupId>net.jandie1505</groupId>
   <artifactId>UpdateDisplayName</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-RELEASE</version>
 </dependency>
 ```
 
