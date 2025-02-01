@@ -12,7 +12,7 @@ To install this plugin, download the plugin for the correct minecraft version fr
 |--|--|--|
 | `/updatedisplayname reload` | Config reload | `updatedisplayname.command` |
 | `/updatedisplayname update` | Updates names of all players | `updatedisplayname.command` |
-| `/updatedisplayname enable [true|false]` | Enable/disable the plugin's functionality | `updatedisplayname.command` |
+| `/updatedisplayname enable [true\|false]` | Enable/disable the plugin's functionality | `updatedisplayname.command` |
 | `/updatedisplayname playerlist` | Shows the exclude list | `updatedisplayname.command` |
 ## Configuration
 The plugin should work out of the box without any configuration needed.  
