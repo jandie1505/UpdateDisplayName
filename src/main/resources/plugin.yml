@@ -7,3 +7,14 @@ softdepend:
   - LuckPerms
   - Vault
   - PlaceholderAPI
+commands:
+  updatedisplayname:
+    description: 'plugin command'
+    permission: updatedisplayname.command
+    aliases: ['udm']
+permission:
+  updatedisplayname.command:
+    description: Access to the plugin command
+  updatedisplayname.*:
+    description: 'Wildcard Permission'
+    children: ['updatedisplayname.command']
