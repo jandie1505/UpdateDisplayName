@@ -26,7 +26,7 @@ public class UDNCommand implements TabCompletingCommandExecutor {
         if (sender != this.plugin.getServer().getConsoleSender() && !sender.hasPermission("updatedisplayname.command")) return true;
 
         if (args.length < 1) {
-            sender.sendMessage(Component.text("Usage: /updatedisplayname (reload|update|playerlist)", NamedTextColor.RED));
+            sender.sendMessage(Component.text("Usage: /updatedisplayname (reload|update|enabled [false|true]|playerlist)", NamedTextColor.RED));
             return true;
         }
 
@@ -41,10 +41,26 @@ public class UDNCommand implements TabCompletingCommandExecutor {
                 sender.sendMessage(Component.text("Updated player displaynames", NamedTextColor.GREEN));
                 return true;
             }
-            case "playerlist" -> {
-                sender.sendMessage(Component.text("Exclude Mode: " + this.plugin.getPluginConfig().optBoolean(UpdateDisplayName.CONFIG_EXCLUDE_MODE, false), NamedTextColor.GRAY));
+            case "enabled" -> {
 
-                for (UUID playerId : this.plugin.getPlayers()) {
+                if (args.length > 1) {
+                    this.plugin.setUpdatesEnabled(Boolean.parseBoolean(args[1]));
+                    sender.sendMessage(
+                            Component.text("Updated enabled set to ", NamedTextColor.GRAY)
+                                    .append(Component.text(this.plugin.isUpdatesEnabled(), this.plugin.isUpdatesEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED))
+                    );
+                } else {
+                    sender.sendMessage(
+                            Component.text("Current status: ", NamedTextColor.GRAY)
+                                    .append(Component.text(this.plugin.isUpdatesEnabled(), this.plugin.isUpdatesEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED))
+                    );
+                }
+
+                return true;
+            }
+            case "playerlist" -> {
+
+                for (UUID playerId : this.plugin.getExcludedPlayers()) {
                     OfflinePlayer player = this.plugin.getServer().getOfflinePlayer(playerId);
                     sender.sendMessage(Component.text("- " + player.getName() + " (uuid=" + playerId + ")", NamedTextColor.GRAY));
                 }
@@ -63,7 +79,9 @@ public class UDNCommand implements TabCompletingCommandExecutor {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String @NotNull [] args) {
 
         if (args.length == 1) {
-            return List.of("reload", "update", "playerlist");
+            return List.of("reload", "update", "enabled", "playerlist");
+        } else if (args.length == 2 && args[0].equals("enabled")) {
+            return List.of("false", "true");
         }
 
         return List.of();

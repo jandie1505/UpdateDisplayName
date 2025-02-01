@@ -5,17 +5,14 @@ import net.chaossquad.mclib.AdventureTagResolvers;
 import net.chaossquad.mclib.IntegrationsCheck;
 import net.chaossquad.mclib.storage.DSSerializer;
 import net.chaossquad.mclib.storage.DataStorage;
+import net.jandie1505.updatedisplayname.api.UDNApi;
 import net.jandie1505.updatedisplayname.command.UDNCommand;
 import net.jandie1505.updatedisplayname.event.DisplayNameUpdatedEvent;
 import net.jandie1505.updatedisplayname.event.TablistNameUpdatedEvent;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -31,22 +28,24 @@ import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 
-public class UpdateDisplayName extends JavaPlugin implements Listener {
-    public static final String CONFIG_EXCLUDE_MODE = "exclude_mode";
+public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
     public static final String CONFIG_ENABLE_DISPLAYNAME = "displayname.enable";
     public static final String CONFIG_FORMAT_DISPLAYNAME = "displayname.format";
     public static final String CONFIG_ENABLE_TABLIST_NAME = "tablist.enable";
     public static final String CONFIG_TABLIST_FORMAT = "tablist.format";
     public static final String CONFIG_UPDATE_INTERVAL = "update_interval";
 
-    @NotNull private final DataStorage config;
-    @NotNull private final Set<UUID> players;
+    private static UDNApi api;
 
+    @NotNull private final DataStorage config;
+    @NotNull private final Set<UUID> excludedPlayers;
+
+    private boolean updatesEnabled;
     private int updateTime;
 
     public UpdateDisplayName() {
         this.config = new DataStorage();
-        this.players = new HashSet<>();
+        this.excludedPlayers = new HashSet<>();
     }
 
     // ----- ENABLE/DISABLE -----
@@ -56,7 +55,6 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
 
         // CONFIG
 
-        this.config.set(CONFIG_EXCLUDE_MODE, true);
         this.config.set(CONFIG_ENABLE_DISPLAYNAME, true);
         this.config.set(CONFIG_FORMAT_DISPLAYNAME, "<luckperms:prefix><player><luckperms:suffix>");
         this.config.set(CONFIG_ENABLE_TABLIST_NAME, true);
@@ -65,8 +63,9 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
 
         this.reloadConfig();
 
-        // TIME
+        // VALUES
 
+        this.updatesEnabled = true;
         this.updateTime = 0;
 
         // COMMAND
@@ -93,18 +92,21 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
 
         // INFO
 
+        api = this;
         this.getLogger().info("UpdateDisplayName has been successfully enabled\ncreated by jandie1505\nGitHub Repository: https://github.com/jandie1505/UpdateDisplayName");
     }
 
     @Override
     public void onDisable() {
+        api = null;
         this.config.clear();
-        this.players.clear();
+        this.excludedPlayers.clear();
     }
 
     // ----- TASKS -----
 
     private void run() {
+        if (!this.updatesEnabled) return;
         int maxTime = this.config.optInt(CONFIG_UPDATE_INTERVAL, 60);
         if (maxTime < 0) return;
 
@@ -133,6 +135,7 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!this.updatesEnabled) return;
         if (this.isPlayerExcluded(event.getPlayer())) return;
         this.updatePlayer(event.getPlayer());
     }
@@ -202,13 +205,7 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
      * @return true = excluded
      */
     public boolean isPlayerExcluded(@NotNull Player player) {
-
-        if (this.config.optBoolean(CONFIG_EXCLUDE_MODE, true)) {
-            return this.players.contains(player.getUniqueId());
-        } else {
-            return !this.players.contains(player.getUniqueId());
-        }
-
+        return this.excludedPlayers.contains(player.getUniqueId());
     }
 
     /**
@@ -217,8 +214,25 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
      * When CONFIG_EXCLUDE_MODE is set to false, this list acts as an include list (only players in this list are updated).
      * @return exclude/include list
      */
-    public @NotNull Set<UUID> getPlayers() {
-        return this.players;
+    public @NotNull Set<UUID> getExcludedPlayers() {
+        return this.excludedPlayers;
+    }
+
+    /**
+     * Returns if name updates are enabled.
+     * @return updates enabled
+     */
+    public boolean isUpdatesEnabled() {
+        return this.updatesEnabled;
+    }
+
+    /**
+     * Set updates enabled.<br/>
+     * When disabled, the plugin will not update player names.
+     * @param updatesEnabled updates enabled
+     */
+    public void setUpdatesEnabled(boolean updatesEnabled) {
+        this.updatesEnabled = updatesEnabled;
     }
 
     // ----- CONFIG -----
@@ -236,7 +250,6 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
                 this.getLogger().info("Config loaded successfully");
             } else {
                 YamlConfiguration ymlConfig = DSSerializer.serialize(this.config);
-                ymlConfig.set(CONFIG_EXCLUDE_MODE, null);
 
                 ymlConfig.setComments(CONFIG_ENABLE_DISPLAYNAME, List.of("Display name = The name which other players will see everywhere except the tablist"));
                 ymlConfig.setComments(CONFIG_FORMAT_DISPLAYNAME, List.of(
@@ -290,6 +303,16 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
      */
     public @NotNull DataStorage getPluginConfig() {
         return config;
+    }
+
+    // ----- API -----
+
+    /**
+     * Returns the API.
+     * @return api
+     */
+    public static UDNApi getApi() {
+        return api;
     }
 
 }
