@@ -11,7 +11,7 @@ commands:
   updatedisplayname:
     description: 'plugin command'
     permission: updatedisplayname.command
-    aliases: ['udm']
+    aliases: ['udn']
 permission:
   updatedisplayname.command:
     description: Access to the plugin command

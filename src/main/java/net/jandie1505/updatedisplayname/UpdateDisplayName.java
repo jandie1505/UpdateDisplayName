@@ -5,6 +5,9 @@ import net.chaossquad.mclib.AdventureTagResolvers;
 import net.chaossquad.mclib.IntegrationsCheck;
 import net.chaossquad.mclib.storage.DSSerializer;
 import net.chaossquad.mclib.storage.DataStorage;
+import net.jandie1505.updatedisplayname.command.UDNCommand;
+import net.jandie1505.updatedisplayname.event.DisplayNameUpdatedEvent;
+import net.jandie1505.updatedisplayname.event.TablistNameUpdatedEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -70,8 +73,9 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
 
         PluginCommand command = this.getCommand("updatedisplayname");
         if (command != null) {
-            command.setExecutor(this);
-            command.setTabCompleter(this);
+            UDNCommand cmd = new UDNCommand(this);
+            command.setExecutor(cmd);
+            command.setTabCompleter(cmd);
         }
 
         // TASK
@@ -113,6 +117,9 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
 
     }
 
+    /**
+     * Calls {@link UpdateDisplayName#updatePlayer(Player)} for all players.
+     */
     public void updatePlayers() {
 
         for (Player player : ImmutableList.copyOf(this.getServer().getOnlinePlayers())) {
@@ -132,18 +139,56 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
 
     // ----- UPDATE NAME -----
 
+    /**
+     * Updates a player's display name and tablist name, if the config values are set.
+     * @param player player
+     */
     public void updatePlayer(@NotNull Player player) {
 
         if (this.config.optBoolean(CONFIG_ENABLE_DISPLAYNAME, false)) {
-            player.displayName(this.generatePlayerDisplayName(player, this.config.optString(CONFIG_FORMAT_DISPLAYNAME, null)));
+            this.updateDisplayName(player);
         }
 
         if (this.config.optBoolean(CONFIG_ENABLE_TABLIST_NAME, false)) {
-            player.playerListName(this.generatePlayerDisplayName(player, this.config.optString(CONFIG_TABLIST_FORMAT, null)));
+            this.updateTablistName(player);
         }
 
     }
 
+    /**
+     * Updates the display name of the specified player.
+     * @param player player
+     */
+    public void updateDisplayName(@NotNull Player player) {
+        Component displayName = this.generatePlayerDisplayName(player, this.config.optString(CONFIG_FORMAT_DISPLAYNAME, null));
+
+        DisplayNameUpdatedEvent event = new DisplayNameUpdatedEvent(player, displayName);
+        this.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
+
+        player.displayName(displayName);
+    }
+
+    /**
+     * Updatest the tablist name of the specified player.
+     * @param player player
+     */
+    public void updateTablistName(@NotNull Player player) {
+        Component tablistName = this.generatePlayerDisplayName(player, this.config.optString(CONFIG_TABLIST_FORMAT, null));
+
+        TablistNameUpdatedEvent event = new TablistNameUpdatedEvent(player, tablistName);
+        this.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
+
+        player.playerListName(tablistName);
+    }
+
+    /**
+     * Generates the player name from the specified format.
+     * @param player player
+     * @param format format
+     * @return name
+     */
     private @Nullable Component generatePlayerDisplayName(@NotNull Player player, @Nullable String format) {
         if (format == null || format.isEmpty()) return null;
         return MiniMessage.miniMessage().deserialize(format, tagResolvers(player).toArray(new TagResolver[0]));
@@ -158,7 +203,7 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
      */
     public boolean isPlayerExcluded(@NotNull Player player) {
 
-        if (this.config.optBoolean(CONFIG_EXCLUDE_MODE, false)) {
+        if (this.config.optBoolean(CONFIG_EXCLUDE_MODE, true)) {
             return this.players.contains(player.getUniqueId());
         } else {
             return !this.players.contains(player.getUniqueId());
@@ -166,59 +211,21 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
 
     }
 
-    // ----- COMMAND -----
-
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-
-        if (sender != this.getServer().getConsoleSender() && !sender.hasPermission("updatedisplayname.command")) return true;
-
-        if (args.length < 1) {
-            sender.sendMessage(Component.text("Usage: /updatedisplayname (reload|update|playerlist)", NamedTextColor.RED));
-            return true;
-        }
-
-        switch (args[0]) {
-            case "reload" -> {
-                this.reloadConfig();
-                sender.sendMessage(Component.text("Reloaded config", NamedTextColor.GREEN));
-                return true;
-            }
-            case "update" -> {
-                this.updatePlayers();
-                sender.sendMessage(Component.text("Updated player displaynames", NamedTextColor.GREEN));
-                return true;
-            }
-            case "playerlist" -> {
-                sender.sendMessage(Component.text("Exclude Mode: " + this.config.optBoolean(CONFIG_EXCLUDE_MODE, false), NamedTextColor.GRAY));
-
-                for (UUID playerId : this.players) {
-                    OfflinePlayer player = this.getServer().getOfflinePlayer(playerId);
-                    sender.sendMessage(Component.text("- " + player.getName() + " (uuid=" + playerId + ")", NamedTextColor.GRAY));
-                }
-
-                return true;
-            }
-            default -> {
-                sender.sendMessage(Component.text("Run command without args to get usage.", NamedTextColor.RED));
-                return true;
-            }
-        }
-
-    }
-
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String @NotNull [] args) {
-
-        if (args.length == 1) {
-            return List.of("reload", "update", "playerlist");
-        }
-
-        return List.of();
+    /**
+     * Returns the plugin exclude/include player list.<br/>
+     * When CONFIG_EXCLUDE_MODE is set to true (default), this list acts as an exclude list (players not in this list are updated).<br/>
+     * When CONFIG_EXCLUDE_MODE is set to false, this list acts as an include list (only players in this list are updated).
+     * @return exclude/include list
+     */
+    public @NotNull Set<UUID> getPlayers() {
+        return this.players;
     }
 
     // ----- CONFIG -----
 
+    /**
+     * Reloads the config from the config file.
+     */
     public void reloadConfig() {
 
         try {
@@ -274,6 +281,15 @@ public class UpdateDisplayName extends JavaPlugin implements Listener {
         if (IntegrationsCheck.vault()) resolvers.add(AdventureTagResolvers.vault("vault", player, true));
 
         return resolvers;
+    }
+
+    /**
+     * Returns the real plugin config.<br/>
+     * Use this instead of {@link JavaPlugin#getConfig()}.
+     * @return config
+     */
+    public @NotNull DataStorage getPluginConfig() {
+        return config;
     }
 
 }
