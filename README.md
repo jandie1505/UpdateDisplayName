@@ -74,7 +74,7 @@ public void ApiExample() {
     DataStorage config = api.getPluginConfig(); // Get plugin config
 
     // Get config values
-    boolean enableDisplaynameUpdate config.optBoolean(UpdateDisplayname.CONFIG_ENABLE_DISPLAYNAME, false);
+    boolean enableDisplaynameUpdate = config.optBoolean(UpdateDisplayname.CONFIG_ENABLE_DISPLAYNAME, false);
     String displayNameFormat = config.optString(UpdateDisplayName.CONFIG_FORMAT_DISPLAYNAME, null);
     boolean enableTablistName = config.optString(UpdateDisplayName.CONFIG_ENABLE_TABLIST_NAME, false);
     String tablistFormat = config.optString(UpdateDisplayName.CONFIG_TABLIST_FORMAT, null);
