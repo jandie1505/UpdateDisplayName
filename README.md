@@ -73,12 +73,14 @@ public void ApiExample() {
         
     DataStorage config = api.getPluginConfig(); // Get plugin config
 
+    // Get config values
     boolean enableDisplaynameUpdate config.optBoolean(UpdateDisplayname.CONFIG_ENABLE_DISPLAYNAME, false);
     String displayNameFormat = config.optString(UpdateDisplayName.CONFIG_FORMAT_DISPLAYNAME, null);
     boolean enableTablistName = config.optString(UpdateDisplayName.CONFIG_ENABLE_TABLIST_NAME, false);
     String tablistFormat = config.optString(UpdateDisplayName.CONFIG_TABLIST_FORMAT, null);
     int updateInterval = config.optInt(UpdateDisplayName.CONFIG_UPDATE_INTERVAL, 60);
 
+    // Set config values
     config.set(UpdateDisplayName.CONFIG_ENABLE_DISPLAYNAME, true);
     config.set(UpdateDisplayName.CONFIG_FORMAT_DISPLAYNAME, "<luckperms:prefix><player><luckperms:suffix>");
     config.set(UpdateDisplayName.CONFIG_ENABLE_TABLIST_NAME, true);
