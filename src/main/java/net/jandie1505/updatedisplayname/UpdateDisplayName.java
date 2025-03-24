@@ -137,7 +137,12 @@ public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!this.updatesEnabled) return;
         if (this.isPlayerExcluded(event.getPlayer())) return;
-        this.updatePlayer(event.getPlayer());
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                UpdateDisplayName.this.updatePlayer(event.getPlayer());
+            }
+        }.runTaskLater(UpdateDisplayName.this, 20L);
     }
 
     // ----- UPDATE NAME -----
