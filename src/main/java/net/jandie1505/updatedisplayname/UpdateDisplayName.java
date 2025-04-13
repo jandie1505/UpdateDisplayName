@@ -303,7 +303,14 @@ public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
                 ymlConfig.setComments(CONFIG_ENABLE_TABLIST_NAME, List.of("Tablist name = The player name in the tablist"));
                 ymlConfig.setComments(CONFIG_TABLIST_FORMAT, List.of("Here you can set the tablist name format.", "You can use it like the display name format."));
                 ymlConfig.setComments(CONFIG_TABLIST_SORT_ENABLE, List.of("Enables tablist sorting using the tablist sort permission"));
-                ymlConfig.setComments(CONFIG_TABLIST_SORT_MAX_LEVEL, List.of("The highest tablist sorting level.", "Levels higher than this will be ignored."));
+                ymlConfig.setComments(CONFIG_TABLIST_SORT_MAX_LEVEL, List.of(
+                        "The highest tablist sorting level.",
+                        "The sorting level determines the position of the player in the tablist.",
+                        "This is done by the permission updatedisplayname.tablist.priority.X.",
+                        "X is replaced with the level.",
+                        "Players with a lower value are more on top of the list than players with higher levels.",
+                        "Levels higher than this config value will be ignored."
+                ));
                 ymlConfig.setComments(CONFIG_UPDATE_INTERVAL, List.of(
                         "The interval in seconds the names are updated (default: 60).",
                         "Set to < 0 to disable auto-update.",
