@@ -13,6 +13,24 @@ commands:
     permission: updatedisplayname.command
     aliases: ['udn']
 permission:
+  updatedisplayname.tablist.priority.0:
+    description: The tablist priority of the player
+  updatedisplayname.tablist.priority.1:
+    description: The tablist priority2of the player
+  updatedisplayname.tablist.priority.3:
+    description: The tablist priority of the player
+  updatedisplayname.tablist.priority.4:
+    description: The tablist priority of the player
+  updatedisplayname.tablist.priority.5:
+    description: The tablist priority of the player
+  updatedisplayname.tablist.priority.6:
+    description: The tablist priority of the player
+  updatedisplayname.tablist.priority.7:
+    description: The tablist priority of the player
+  updatedisplayname.tablist.priority.8:
+    description: The tablist priority of the player
+  updatedisplayname.tablist.priority.9:
+    description: The tablist priority of the player
   updatedisplayname.command:
     description: Access to the plugin command
   updatedisplayname.*:

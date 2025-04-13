@@ -31,8 +31,10 @@ import java.util.logging.Level;
 public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
     public static final String CONFIG_ENABLE_DISPLAYNAME = "displayname.enable";
     public static final String CONFIG_FORMAT_DISPLAYNAME = "displayname.format";
-    public static final String CONFIG_ENABLE_TABLIST_NAME = "tablist.enable";
-    public static final String CONFIG_TABLIST_FORMAT = "tablist.format";
+    public static final String CONFIG_ENABLE_TABLIST_NAME = "tablist.name.enable";
+    public static final String CONFIG_TABLIST_FORMAT = "tablist.name.format";
+    public static final String CONFIG_TABLIST_SORT_ENABLE = "tablist.sort.enable";
+    public static final String CONFIG_TABLIST_SORT_MAX_LEVEL = "tablist.sort.max_level";
     public static final String CONFIG_UPDATE_INTERVAL = "update_interval";
 
     private static UDNApi api;
@@ -59,6 +61,8 @@ public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
         this.config.set(CONFIG_FORMAT_DISPLAYNAME, "<luckperms:prefix><player><luckperms:suffix>");
         this.config.set(CONFIG_ENABLE_TABLIST_NAME, true);
         this.config.set(CONFIG_TABLIST_FORMAT, "<luckperms:prefix><player><luckperms:suffix>");
+        this.config.set(CONFIG_TABLIST_SORT_ENABLE, true);
+        this.config.set(CONFIG_TABLIST_SORT_MAX_LEVEL, 9);
         this.config.set(CONFIG_UPDATE_INTERVAL, 60);
 
         this.reloadConfig();
@@ -113,6 +117,7 @@ public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
         if (this.updateTime > maxTime) {
             this.updateTime = 0;
             this.updatePlayers();
+            this.updateTabListSort();
         } else {
             this.updateTime++;
         }
@@ -202,6 +207,31 @@ public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
         return MiniMessage.miniMessage().deserialize(format, tagResolvers(player).toArray(new TagResolver[0]));
     }
 
+    // ----- TABLIST SORT -----
+
+    public void updateTabListSort() {
+        List<? extends Player> sortedPlayers = this.getServer().getOnlinePlayers().stream()
+                .sorted(Comparator.comparing(this::getTabListPriority))
+                .toList();
+
+        int id = 0;
+        for (Player player : sortedPlayers) {
+            player.setPlayerListOrder(id);
+            id++;
+        }
+    }
+
+    public int getTabListPriority(@NotNull Player player) {
+        int maxValue = this.config.optInt(CONFIG_TABLIST_SORT_MAX_LEVEL, 9);
+        if (maxValue < 0) return 0;
+
+        for (int i = 0; i <= maxValue; i++) {
+            if (player.hasPermission("updatedisplayname.tablist.priority." + i)) return i;
+        }
+
+        return maxValue;
+    }
+
     // ----- MANAGEMENT -----
 
     /**
@@ -272,6 +302,8 @@ public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
                 ));
                 ymlConfig.setComments(CONFIG_ENABLE_TABLIST_NAME, List.of("Tablist name = The player name in the tablist"));
                 ymlConfig.setComments(CONFIG_TABLIST_FORMAT, List.of("Here you can set the tablist name format.", "You can use it like the display name format."));
+                ymlConfig.setComments(CONFIG_TABLIST_SORT_ENABLE, List.of("Enables tablist sorting using the tablist sort permission"));
+                ymlConfig.setComments(CONFIG_TABLIST_SORT_MAX_LEVEL, List.of("The highest tablist sorting level.", "Levels higher than this will be ignored."));
                 ymlConfig.setComments(CONFIG_UPDATE_INTERVAL, List.of(
                         "The interval in seconds the names are updated (default: 60).",
                         "Set to < 0 to disable auto-update.",
