@@ -36,9 +36,14 @@ public class UDNCommand implements TabCompletingCommandExecutor {
                 sender.sendMessage(Component.text("Reloaded config", NamedTextColor.GREEN));
                 return true;
             }
-            case "update" -> {
+            case "update-players" -> {
                 this.plugin.updatePlayers();
-                sender.sendMessage(Component.text("Updated player displaynames", NamedTextColor.GREEN));
+                sender.sendMessage(Component.text("Updated player names", NamedTextColor.GREEN));
+                return true;
+            }
+            case "update-sorting" -> {
+                this.plugin.updateTabListSort();
+                sender.sendMessage(Component.text("Updated tab list sorting", NamedTextColor.GREEN));
                 return true;
             }
             case "enabled" -> {
@@ -79,7 +84,7 @@ public class UDNCommand implements TabCompletingCommandExecutor {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String @NotNull [] args) {
 
         if (args.length == 1) {
-            return List.of("reload", "update", "enabled", "playerlist");
+            return List.of("reload", "update-players", "update-sorting", "enabled", "playerlist");
         } else if (args.length == 2 && args[0].equals("enabled")) {
             return List.of("false", "true");
         }
