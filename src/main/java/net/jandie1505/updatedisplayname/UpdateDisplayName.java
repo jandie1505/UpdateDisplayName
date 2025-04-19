@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -214,10 +215,10 @@ public class UpdateDisplayName extends JavaPlugin implements Listener, UDNApi {
                 .sorted(Comparator.comparing(this::getTabListPriority))
                 .toList();
 
-        int id = 0;
+        int id = sortedPlayers.size();
         for (Player player : sortedPlayers) {
             player.setPlayerListOrder(id);
-            id++;
+            id--;
         }
     }
 
